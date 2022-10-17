@@ -1,7 +1,9 @@
 import os
 
 import numpy as np
-from .utils import use_par, use_pars
+
+from .utils import use_par
+
 _CACHE_FILES = ".MScache_files"
 _MSC_USE_CACHE = True
 
@@ -11,9 +13,9 @@ def make_cache_dir(_CACHE_FILES=_CACHE_FILES):
         os.mkdir(_CACHE_FILES)
 
 
-def cache(MSC_name=None,*,dim=2):
+def cache(MSC_name=None, *, dim=2):
     """Wrapper add possibility caching function result to wrapped function
-    
+
     Wrapper add possibility caching function result to wrapped function.
     If file MSC_name.txt exist in _CACHE_FILES
         wraped function return cache from right cache.
@@ -99,24 +101,10 @@ def read_from_file(file_name, sep_in_data=",", show_warr=True):
             break
         try:
             data[i] = [float(k) for k in data[i].split(sep_in_data)]
-        except:
+        except ValueError:
             data[i] = data[i].split(sep_in_data)
             if show_warr is False:
                 continue
             print("Warring! Data was read as string.")
 
     return np.array(data[1:])
-
-
-if __name__ == "__main__":
-
-    @cache("foo")
-    def foo(a, b):
-        return [[a + b]]
-
-    print(foo(1, 2))
-    print(foo(1, 2))
-    print(foo(1, 2, use_cache=False))
-    print(foo(1, 2))
-
-    # get_name()

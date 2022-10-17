@@ -1,5 +1,3 @@
-
-
 def use_par(par):
     """
     Wrapper set self argument as first function argument.
@@ -23,7 +21,7 @@ def use_pars(*pars):
     def wrap(fun):
         def INNER(*args, **kwargs):
             return fun(*pars, *args, **kwargs)
-            
+
         INNER.__name__ = fun.__name__
         return INNER
 
