@@ -2,31 +2,36 @@ import os
 
 import numpy as np
 from .utils import use_par, use_pars
-_CACHE_FILE = ".MScache_file"
+_CACHE_FILES = ".MScache_files"
 _MSC_USE_CACHE = True
 
 
-def make_cache_dir(_CACHE_FILE=_CACHE_FILE):
-    if _CACHE_FILE not in os.listdir():
-        os.mkdir(_CACHE_FILE)
+def make_cache_dir(_CACHE_FILES=_CACHE_FILES):
+    if _CACHE_FILES not in os.listdir():
+        os.mkdir(_CACHE_FILES)
 
 
-def cache(MSC_name=None):
-    """Dekorator który cachuje wynik funkcji.
-        Jeżeli klucz istnieje kożysta z cacha, jeżeli nie
-        to zapisuje go do pliku MSC_name.
-        (Jeżeli MSC_name == None zapisuje do pliku o nazwie funkcji).
-        Dekorator dodaje argument opcjonalny use_cache,
-            który jeżeli jest False nadpisuje cacha nowym,
-            w przeciwnym wypadku kożysta z cache.
+def cache(MSC_name=None,*,dim=2):
+    """Wrapper add possibility caching function result to wrapped function
+    
+    Wrapper add possibility caching function result to wrapped function.
+    If file MSC_name.txt exist in _CACHE_FILES
+        wraped function return cache from right cache.
+    else
+        make new cache
+    Wrapper add optional argument 'use_cache'.
+    If use_cache == False
+        cache will overwrite.
+
     Args:
-        MSC_name (string, optional): Klucz po którym dobierany jest cache.
-            If None MSC_name to nazwa cachowanej funkcji. Defaults to None.
+        MSC_name (string, optional): name of cache (key to identify)
+            If MSC_name is None then stay __name__ of cached function. Defaults to None.
+
     Returns:
-        fun: funkcja która kożysta z cacha.
+        fun: Function with cache functionality.
     """
-    if _CACHE_FILE not in os.listdir():
-        make_cache_dir(_CACHE_FILE)
+    if _CACHE_FILES not in os.listdir():
+        make_cache_dir(_CACHE_FILES)
 
     @use_par(MSC_name)
     def wrapper(MSC_name, fun):
@@ -34,10 +39,10 @@ def cache(MSC_name=None):
             MSC_name = fun.__name__
 
         def TO_RETURN(*args, use_cache=_MSC_USE_CACHE):
-            if MSC_name in os.listdir(_CACHE_FILE) and use_cache:
-                return read_from_file(os.sep.join([_CACHE_FILE, MSC_name]))
+            if MSC_name in os.listdir(_CACHE_FILES) and use_cache:
+                return read_from_file(os.sep.join([_CACHE_FILES, MSC_name]))
             ret = fun(*args)
-            save_to_file(ret, os.sep.join([_CACHE_FILE, MSC_name]), MSC_name)
+            save_to_file(ret, os.sep.join([_CACHE_FILES, MSC_name]), MSC_name)
             return ret
 
         TO_RETURN.__name__ = fun.__name__
@@ -98,7 +103,7 @@ def read_from_file(file_name, sep_in_data=",", show_warr=True):
             data[i] = data[i].split(sep_in_data)
             if show_warr is False:
                 continue
-            print("Warring! Dane zostały przeczytane jako str.")
+            print("Warring! Data was read as string.")
 
     return np.array(data[1:])
 
