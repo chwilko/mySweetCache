@@ -9,10 +9,36 @@ SETUP = {
     "MSC_USE_CACHE": True,
 }
 
+
 def make_cache_dir(_CACHE_FILES=SETUP["CACHE_FILES"]):
     if _CACHE_FILES not in os.listdir():
         os.mkdir(_CACHE_FILES)
 
+def read_cache(MSC_name: str, cache_folder: str=None):
+    """File to fast read MSC.
+
+    Args:
+        MSC_name (str): cache key to read.
+        cache_folder (str, optional): Cache will be read from .MScache_files from cache_folder.
+        If cache_folder is None is used current folder. Defaults to None.
+
+    Raises:
+        NameError: If this cache don't exist.
+
+    Returns:
+        _type_: _description_
+    """    
+    if cache_folder is None:
+        cache_folder = SETUP["CACHE_FILES"]
+    cache_folder += SETUP["CACHE_FILES"]
+    if not os.path.exists(os.sep.join([cache_folder, MSC_name])):
+        raise NameError(f"{MSC_name} cache not exist")
+
+    @cache(MSC_name)
+    def NobodyExpectsTheSpanishInquisition():
+        return
+    return NobodyExpectsTheSpanishInquisition(use_cache=True)
+    
 
 def cache(MSC_name=None, *, dim=2):
     """Wrapper add possibility caching function result to wrapped function

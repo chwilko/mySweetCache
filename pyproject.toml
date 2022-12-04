@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "mysweetcache"
+name = "mySweetCache"
 version = "0.1.0"
 description = ""
 authors = ["chwilko <bartekchwilkowski@gmail.com>"]
@@ -11,6 +11,25 @@ python = "^3.8"
 numpy = "^1.23.4"
 
 
+
+[project]
+name = "mySweetCache"
+version = "0.1.0"
+authors = [
+  { name="Bartłomiej Chwiłkowski", email="bartekchwilkowski@gmail.com" },
+]
+description = "Package to fast and easy cache"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/chwilko/mySweetCache"
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
