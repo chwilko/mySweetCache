@@ -4,11 +4,12 @@ import numpy as np
 
 from .utils import use_par
 
-_CACHE_FILES = ".MScache_files"
-_MSC_USE_CACHE = True
+SETUP = {
+    "CACHE_FILES": ".MScache_files",
+    "MSC_USE_CACHE": True,
+}
 
-
-def make_cache_dir(_CACHE_FILES=_CACHE_FILES):
+def make_cache_dir(_CACHE_FILES=SETUP["CACHE_FILES"]):
     if _CACHE_FILES not in os.listdir():
         os.mkdir(_CACHE_FILES)
 
@@ -32,19 +33,19 @@ def cache(MSC_name=None, *, dim=2):
     Returns:
         fun: Function with cache functionality.
     """
-    if _CACHE_FILES not in os.listdir():
-        make_cache_dir(_CACHE_FILES)
+    if SETUP["CACHE_FILES"] not in os.listdir():
+        make_cache_dir(SETUP["CACHE_FILES"])
 
     @use_par(MSC_name)
     def wrapper(MSC_name, fun):
         if MSC_name is None:
             MSC_name = fun.__name__
 
-        def TO_RETURN(*args, use_cache=_MSC_USE_CACHE):
-            if MSC_name in os.listdir(_CACHE_FILES) and use_cache:
-                return read_from_file(os.sep.join([_CACHE_FILES, MSC_name]))
+        def TO_RETURN(*args, use_cache=SETUP["MSC_USE_CACHE"]):
+            if MSC_name in os.listdir(SETUP["CACHE_FILES"]) and use_cache:
+                return read_from_file(os.sep.join([SETUP["CACHE_FILES"], MSC_name]))
             ret = fun(*args)
-            save_to_file(ret, os.sep.join([_CACHE_FILES, MSC_name]), MSC_name)
+            save_to_file(ret, os.sep.join([SETUP["CACHE_FILES"], MSC_name]), MSC_name)
             return ret
 
         TO_RETURN.__name__ = fun.__name__
@@ -89,7 +90,7 @@ def read_from_file(file_name, sep_in_data=",", show_warr=True):
         sep_in_data (str, optional): znak jakim mają być oddzielane dane. Defaults to ",".
         show_warr (bool, optional): jeżeli true, funkcja wyświetli ostrzerzenie
             jeżeli danych nie uda się zamienić na liczby
-            i zwruci je jako str. Defaults to True.
+            i zwroci je jako str. Defaults to True.
     Returns:
         np.array: dwuwymiarowa macierz
     """
