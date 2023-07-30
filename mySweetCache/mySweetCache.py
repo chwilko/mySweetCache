@@ -1,20 +1,12 @@
 import os
+from typing import Any, Callable, Optional
 
 import numpy as np
-
-from .utils import use_par
-
-SETUP = {
-    "CACHE_FILES": ".MScache_files",
-    "MSC_USE_CACHE": True,
-}
+from .common import SETUP
+from .utils import use_par, make_cache_dir
 
 
-def make_cache_dir(_CACHE_FILES=SETUP["CACHE_FILES"]):
-    if _CACHE_FILES not in os.listdir():
-        os.mkdir(_CACHE_FILES)
-
-def read_cache(MSC_name: str, cache_folder: str=None):
+def read_cache(MSC_name: str, cache_folder: Optional[str]=None) -> Any:
     """File to fast read MSC.
 
     Args:
@@ -40,7 +32,7 @@ def read_cache(MSC_name: str, cache_folder: str=None):
     return NobodyExpectsTheSpanishInquisition(use_cache=True)
     
 
-def cache(MSC_name=None, *, dim=2):
+def cache(MSC_name: Optional[str]=None, *, dim: int=2):
     """Wrapper add possibility caching function result to wrapped function
 
     Wrapper add possibility caching function result to wrapped function.
@@ -63,11 +55,11 @@ def cache(MSC_name=None, *, dim=2):
         make_cache_dir(SETUP["CACHE_FILES"])
 
     @use_par(MSC_name)
-    def wrapper(MSC_name, fun):
+    def wrapper(MSC_name: Optional[str], fun: Callable):
         if MSC_name is None:
             MSC_name = fun.__name__
 
-        def TO_RETURN(*args, use_cache=SETUP["MSC_USE_CACHE"]):
+        def TO_RETURN(*args, use_cache: bool=SETUP["MSC_USE_CACHE"]):
             if MSC_name in os.listdir(SETUP["CACHE_FILES"]) and use_cache:
                 return read_from_file(os.sep.join([SETUP["CACHE_FILES"], MSC_name]))
             ret = fun(*args)
