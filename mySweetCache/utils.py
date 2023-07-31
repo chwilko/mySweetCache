@@ -35,5 +35,5 @@ def make_cache_dir(_CACHE_FILES=SETUP["CACHE_FILES"]):
     if _CACHE_FILES not in os.listdir():
         os.mkdir(_CACHE_FILES)
         with open(os.sep.join([_CACHE_FILES, ".gitignore"]), "w", encoding="utf-8") as f:
-            print(_CACHE_FILES, file=f)
+            print("# Created by mySweetCache automatically.\n*\n", file=f)
             
