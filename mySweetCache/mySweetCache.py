@@ -18,7 +18,7 @@ def read_cache(MSC_name: str, cache_folder: Optional[str]=None) -> Any:
         NameError: If this cache don't exist.
 
     Returns:
-        _type_: _description_
+        np.array: two dimmentional matrix.
     """    
     if cache_folder is None:
         cache_folder = SETUP["CACHE_FILES"]
@@ -73,14 +73,14 @@ def cache(MSC_name: Optional[str]=None, *, dim: int=2):
 
 
 def save_to_file(lists, file_name, header="", sep_in_data=","):
-    """Funkcja zapisuje podane estymowane dane do późniejszego wykożystania.
-    Aby je późnije odczytać należy użyć funkcji read_from_file.
+    """The function saves the given estimated data for later use.
+    To read them later, use the read_from_file function.
     Args:
-        lists (_type_): lista list plików do zapisania. najlepiej dwuwymiarowy np.array
-        file_name (string): azwa pliku, w którym mają być zapisane dane
-        header (str, optional): pierwsza linijka stanowiąca opis danych,
-            ignorowana później, przy odczytywaniu. Defaults to "".
-        sep_in_data (str, optional): znak jakim mają być oddzielane dane. Defaults to ",".
+        lists (_type_): A list of lists of files to save. preferably two-dimensional np.array
+        file_name (string): The name of the file in which the data is to be stored.
+        header (str, optional): The first line that is a description of the data,
+            ignored later, when reading. Defaults to "".
+        sep_in_data (str, optional): The character with which the data is to be separated. Defaults to ",".
     """
     ret = header + "\n"
     for el in lists:
@@ -102,15 +102,15 @@ def save_to_file(lists, file_name, header="", sep_in_data=","):
 
 
 def read_from_file(file_name, sep_in_data=",", show_warr=True):
-    """Funkcja odczytuje zapisane wczesniej dane funkcją save_to_file.
+    """The function reads previously saved data with the save_to_file function.
     Args:
-        file_name (string): nazwa pliku, z którego mają być odczytane dane
-        sep_in_data (str, optional): znak jakim mają być oddzielane dane. Defaults to ",".
-        show_warr (bool, optional): jeżeli true, funkcja wyświetli ostrzerzenie
-            jeżeli danych nie uda się zamienić na liczby
-            i zwroci je jako str. Defaults to True.
+        file_name (string): the name of the file from which data is to be read
+        sep_in_data (str, optional): The character with which the data is to be separated. Defaults to ",".
+        show_warr (bool, optional): if true, the function will display a warning
+            if the data cannot be converted into numbers
+            and returns them as str. Defaults to True.
     Returns:
-        np.array: dwuwymiarowa macierz
+        np.array: two dimmentional matrix.
     """
     with open(file_name, "r") as f:
         data = f.read().split("\n")
