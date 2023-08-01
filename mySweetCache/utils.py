@@ -1,6 +1,14 @@
 import os
+from typing import Optional
+import pkg_resources
 
 from .common import SETUP
+
+def get_package_version():
+    try:
+        return pkg_resources.get_distribution("mySweetCache").version
+    except pkg_resources.DistributionNotFound:
+        return "Unknown."
 
 
 def use_par(par):
@@ -33,7 +41,8 @@ def use_pars(*pars):
     return wrap
 
 
-def make_cache_dir(_CACHE_FILES=SETUP["CACHE_FILES"]):
+def make_cache_dir(_CACHE_FILES: Optional[str]=None):
+    _CACHE_FILES = _CACHE_FILES or SETUP.CACHE_FILES
     if _CACHE_FILES not in os.listdir():
         os.mkdir(_CACHE_FILES)
         with open(

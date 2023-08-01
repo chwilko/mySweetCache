@@ -1,93 +1,61 @@
 import os
-from ast import List
-from ctypes import Union
-from typing import Optional
-
+from typing import Optional, Union, TypedDict, List
+import json
 import numpy as np
-from .common import DataTypes
+
+from mySweetCache.utils import get_package_version, make_cache_dir
+from mySweetCache.common import SETUP
+
+class DataInfo(TypedDict):
+    shape: List[int]
+    dtype: str
+    header: str
+    sep_in_data: str
+
+DEFAULT_HEADER = f"Data stored by mySweetCache{get_package_version()}"
 
 class SaveHelper:
-    def __init__(
-        self,
-        *,
-        is_string: bool=False,
-        dim: Optional[int]=2,
-    ) -> None:
-        if is_string:
-            self.data_type = DataTypes.STRING
-        else:
-            self.data_type = DataTypes.NUMBER
-        self.dim = dim
+    INFO = "info.json"
+    def store_path(self, *files):
+        if not os.path.exists(SETUP.CACHE_FILES):
+            make_cache_dir()
+        return os.sep.join([SETUP.CACHE_FILES, *files])
 
-    def store(
-        self,
-        cache_name: str,
-        header: str="",
-    ):
-        pass
-
+    def get_data_info(self, data: np.ndarray, header: str, sep_in_data: str):
+        info: DataInfo = {
+            "shape": data.shape,
+            "dtype": data.dtype,
+            "header": header,
+            "sep_in_data": sep_in_data,
+        }
+        return info
 
     def save_to_file(
         self,
-        lists: Union[np.ndarray, List[List[float]]],
+        data: np.ndarray,
         file_name: str,
-        header: str = "",
+        *,
+        header: Optional[str] = None,
         sep_in_data: str = ",",
     ):
-        """The function saves the given estimated data for later use.
-        To read them later, use the read_from_file function.
-        Args:
-            lists (Union[np.ndarray, List[List[float]]]): A list of lists of files to save. preferably two-dimensional np.array
-            file_name (string): The name of the file in which the data is to be stored.
-            header (str, optional): The first line that is a description of the data,
-                ignored later, when reading. Defaults to "".
-            sep_in_data (str, optional): The character with which the data is to be separated. Defaults to ",".
-        """
-        ret = header + "\n"
-        for el in lists:
-            for i in el:
-                ret += str(i) + sep_in_data
-            ret = ret[:-1] + "\n"
-        try:
-            with open(file_name, "w") as f:
-                f.write(ret)
-        except FileNotFoundError:
-            old = os.getcwd()
-            path = file_name.split(os.sep)[:-1]
-            for i in path:
-                os.mkdir(i)
-                os.chdir(i)
-            os.chdir(old)
-            with open(file_name, "w") as f:
-                f.write(ret)
+        header = header or DEFAULT_HEADER
+        data_info = self.get_data_info(data, header, sep_in_data)
+        with open(self.store_path(SaveHelper.INFO), "w", encoding="utf-8") as f:
+            json.dump(data_info, f, indent=4)
+        data.tofile(self.get_data_info(file_name), sep=sep_in_data)
+
 
     def read_from_file(
         self,
         file_name: str,
+        *,
         sep_in_data: str=",",
-        show_warr: bool=True,
     ):
-        """The function reads previously saved data with the save_to_file function.
-        Args:
-            file_name (string): the name of the file from which data is to be read
-            sep_in_data (str, optional): The character with which the data is to be separated. Defaults to ",".
-            show_warr (bool, optional): if true, the function will display a warning
-                if the data cannot be converted into numbers
-                and returns them as str. Defaults to True.
-        Returns:
-            np.array: two dimmentional matrix.
-        """
-        with open(file_name, "r") as f:
-            data = f.read().split("\n")
-        for i in range(1, len(data)):
-            if data[i] == "":
-                data = data[:i]
-                break
-            try:
-                data[i] = [float(k) for k in data[i].split(sep_in_data)]
-            except ValueError:
-                data[i] = data[i].split(sep_in_data)
-                if show_warr:
-                    print("Warring! Data was read as string.")
-
-        return np.array(data[1:])
+        with open(self.store_path(SaveHelper.INFO), "r", encoding="utf-8") as f:
+            info: DataInfo = json.load(f)
+        sep_in_data = sep_in_data or info["sep_in_data"]
+        return np.fromfile(
+            file_name,
+            dtype=info["dtype"],
+            sep=sep_in_data,
+        ).reshape(info["shape"])
