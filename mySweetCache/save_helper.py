@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union, TypedDict, List
+from typing import Optional, TypedDict, List
 import json
 import numpy as np
 
@@ -24,7 +24,7 @@ class SaveHelper:
     def get_data_info(self, data: np.ndarray, header: str, sep_in_data: str):
         info: DataInfo = {
             "shape": data.shape,
-            "dtype": data.dtype,
+            "dtype": str(data.dtype),
             "header": header,
             "sep_in_data": sep_in_data,
         }
@@ -40,22 +40,29 @@ class SaveHelper:
     ):
         header = header or DEFAULT_HEADER
         data_info = self.get_data_info(data, header, sep_in_data)
-        with open(self.store_path(SaveHelper.INFO), "w", encoding="utf-8") as f:
+        cache_folder = self.store_path(file_name)
+        if not os.path.exists(cache_folder):
+            os.mkdir(self.store_path(file_name))
+        with open(self.store_path(file_name, SaveHelper.INFO), "w", encoding="utf-8") as f:
             json.dump(data_info, f, indent=4)
-        data.tofile(self.get_data_info(file_name), sep=sep_in_data)
+        data.tofile(self.store_path(file_name, file_name), sep=sep_in_data)
 
 
     def read_from_file(
         self,
         file_name: str,
         *,
-        sep_in_data: str=",",
+        sep_in_data: str=None,
     ):
-        with open(self.store_path(SaveHelper.INFO), "r", encoding="utf-8") as f:
+        with open(self.store_path(file_name, SaveHelper.INFO), "r", encoding="utf-8") as f:
             info: DataInfo = json.load(f)
         sep_in_data = sep_in_data or info["sep_in_data"]
         return np.fromfile(
-            file_name,
+            self.store_path(file_name, file_name),
             dtype=info["dtype"],
             sep=sep_in_data,
         ).reshape(info["shape"])
+
+
+    def cache_exists(self, file_name: str):
+        return os.path.exists(self.store_path(file_name))
