@@ -1,8 +1,10 @@
 import os
 from typing import Optional
+
 import pkg_resources
 
 from .common import SETUP
+
 
 def get_package_version():
     try:
@@ -41,7 +43,7 @@ def use_pars(*pars):
     return wrap
 
 
-def make_cache_dir(_CACHE_FILES: Optional[str]=None):
+def make_cache_dir(_CACHE_FILES: Optional[str] = None):
     _CACHE_FILES = _CACHE_FILES or SETUP.CACHE_FILES
     if _CACHE_FILES not in os.listdir():
         os.mkdir(_CACHE_FILES)
