@@ -4,82 +4,110 @@ from typing import Any, Callable, Optional
 from numpy import ndarray
 
 from mySweetCache.exceptions import MSCDoesNotExistException
+from mySweetCache.save_helper import SaveHelper
+from mySweetCache.setup import SETUP
+from mySweetCache.utils import make_cache_dir, use_par
 
-from .common import SETUP
-from .save_helper import SaveHelper
-from .utils import make_cache_dir, use_par
 
+def read_cache(MSC_name: str) -> Any:
+    """Function to fast read MSC.
 
-def read_cache(MSC_name: str, cache_folder: Optional[str] = None) -> Any:
-    # """Function to fast read MSC.
+    Args:
+        MSC_name (str): cache key to read.
 
-    # Args:
-    #     MSC_name (str): cache key to read.
-    #     cache_folder (str, optional): Cache will be read from cache_folder if None
-    #         .MScache_files. Defaults None.
-    #     If cache_folder is None is used current folder. Defaults to None.
+    Raises:
+        NameError: If this cache don't exist.
 
-    # Raises:
-    #     NameError: If this cache don't exist.
-
-    # Returns:
-    #     np.array: two dimmentional matrix.
-    # """
-    if cache_folder is None:
-        cache_folder = SETUP.CACHE_FILES
-    print(os.sep.join([cache_folder, MSC_name]))
+    Returns:
+        np.array: Previously saved data.
+    """
+    cache_folder = SETUP.CACHE_FILES
     if not os.path.exists(os.sep.join([cache_folder, MSC_name])):
         raise MSCDoesNotExistException(f"{MSC_name} cache not exist")
 
-    @cache(MSC_name)
-    def NobodyExpectsTheSpanishInquisition():
-        return
+    return SaveHelper.read_from_file(MSC_name)
 
-    return NobodyExpectsTheSpanishInquisition(use_cache=True)
+
+def save_cache(
+    MSC_name: str,
+    data: ndarray,
+    *,
+    header: Optional[str] = None,
+    sep_in_data: str = "",
+) -> None:
+    """Function to fast save MSC.
+
+    Args:
+        MSC_name (str): cache key to save.
+        data (ndarray): data to save
+        sep_in_data (Optional[str], optional): Separator between array items
+            for text output. If "" (empty), a binary file is written,
+            equivalent to file.write(a.tobytes()).
+    """
+
+    SaveHelper.save_to_file(data, MSC_name, header=header, sep_in_data=sep_in_data)
 
 
 def cache(
     MSC_name: Optional[str] = None,
     *,
     header: Optional[str] = None,
-    sep_in_data: str = ",",
-):
-    # """Wrapper add possibility caching function result to wrapped function
+    sep_in_data: str = "",
+) -> Callable:
+    """Wrapper add possibility caching function result to wrapped function
 
-    # Wrapper add possibility caching function result to wrapped function.
-    # If file MSC_name.txt exist in _CACHE_FILES
-    #     wraped function return cache from right cache.
-    # else
-    #     make new cache
-    # Wrapper add optional argument 'use_cache'.
-    # If use_cache == False
-    #     cache will overwrite.
+    If file MSC_name exist in _CACHE_FILES
+        wraped function return cache from right cache.
+    else
+        make new cache
+    Wrapper add optional argument 'use_cache'.
+    If use_cache == False
+        cache will overwrite.
 
-    # Args:
-    #     MSC_name (string, optional): name of cache (key to identify)
-    #         If MSC_name is None then stay __name__ of cached function. Defaults to None.
+    example use:
+        @cache("key")
+        def long_working_function() -> np.ndarray:
+            # long code to work
+            return ...
 
-    # Returns:
-    #     fun: Function with cache functionality.
-    # """
+    example use 2:
+        @cache("key")
+        @use_parms(11, 21)
+        def long_working_function(arg1, arg2) -> np.ndarray:
+            # long code to work
+            return ...
+
+
+    Args:
+        MSC_name (Optional[str], optional): cache key. Defaults to None.
+        header (Optional[str], optional): data description. Defaults to None.
+        sep_in_data (str, optional): Separator between array items
+            for text output. If "" (empty), a binary file is written,
+            equivalent to file.write(a.tobytes()). Defaults to "".
+
+    Returns:
+        callable: Function with cache functionality.
+    """
     if SETUP.CACHE_FILES not in os.listdir():
-        make_cache_dir(SETUP.CACHE_FILES)
+        make_cache_dir()
 
     @use_par(MSC_name)
-    def wrapper(MSC_name: Optional[str], fun: Callable[[], ndarray]):
+    def wrapper(
+        MSC_name: Optional[str],
+        fun: Callable[[], ndarray],
+    ):
         MSC_name = MSC_name or fun.__name__
 
         def TO_RETURN(*args, use_cache: Optional[bool] = None):
             if use_cache is None:
                 use_cache = SETUP.MSC_USE_CACHE
-            save_helper = SaveHelper()
-            if save_helper.cache_exists(MSC_name) and use_cache:
-                return save_helper.read_from_file(
+            # SaveHelper = SaveHelper()
+            if SaveHelper.cache_exists(MSC_name) and use_cache:
+                return SaveHelper.read_from_file(
                     MSC_name,
-                    sep_in_data=sep_in_data,
                 )
             ret = fun(*args)
-            save_helper.save_to_file(
+            SaveHelper.save_to_file(
                 ret,
                 MSC_name,
                 header=header,

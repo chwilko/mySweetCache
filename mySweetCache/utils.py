@@ -1,12 +1,16 @@
 import os
-from typing import Optional
 
 import pkg_resources
 
-from .common import SETUP
+from .setup import SETUP
 
 
-def get_package_version():
+def get_package_version() -> str:
+    """Get package version. If unknown 'Unknown'
+
+    Returns:
+        str: package version.
+    """
     try:
         return pkg_resources.get_distribution("mySweetCache").version
     except pkg_resources.DistributionNotFound:
@@ -15,7 +19,7 @@ def get_package_version():
 
 def use_par(par):
     """
-    Wrapper set self argument as first function argument.
+    Decorator set self argument as first function argument.
     """
 
     def wrap(fun):
@@ -30,7 +34,7 @@ def use_par(par):
 
 def use_pars(*pars):
     """
-    Wrapper set self arguments as first function arguments.
+    Decorator set self arguments as first function arguments.
     """
 
     def wrap(fun):
@@ -43,11 +47,15 @@ def use_pars(*pars):
     return wrap
 
 
-def make_cache_dir(_CACHE_FILES: Optional[str] = None):
-    _CACHE_FILES = _CACHE_FILES or SETUP.CACHE_FILES
+def make_cache_dir():
+    """Create cache folder"""
+    _CACHE_FILES = SETUP.CACHE_FILES
     if _CACHE_FILES not in os.listdir():
         os.mkdir(_CACHE_FILES)
+        val = ""
+        if SETUP.IGNORE_CACHES:
+            val = "*"
         with open(
             os.sep.join([_CACHE_FILES, ".gitignore"]), "w", encoding="utf-8"
         ) as f:
-            print("# Created by mySweetCache automatically.\n*\n", file=f)
+            print(f"# Created by mySweetCache automatically.\n\n{val}", file=f)

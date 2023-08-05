@@ -15,7 +15,7 @@ init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.app
 disable=missing-module-docstring,invalid-name,wildcard-import
 
 [FORMAT]
-max-line-length=100
+max-line-length=88
 
 [DESIGN]
 max-attributes=32
