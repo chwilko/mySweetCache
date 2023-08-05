@@ -1,2 +1,5 @@
 **/__pycache__/**
 .MScache_files/**
+TODO.*
+dist
+sandbox*

@@ -1,20 +1,30 @@
 [tool.poetry]
 name = "mySweetCache"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = ["chwilko <bartekchwilkowski@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.8.1"
 numpy = "^1.23.4"
+black = "^23.7.0"
+mypy = "^1.4.1"
+isort = "^5.12.0"
+pylint = "^2.17.5"
+flake8 = "^6.1.0"
+pytest = "^7.4.0"
+types-setuptools = "^68.0.0.3"
 
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.25.0"
 
 [project]
 name = "mySweetCache"
-version = "0.1.0"
+version = "1.0.0"
 authors = [
   { name="Bartłomiej Chwiłkowski", email="bartekchwilkowski@gmail.com" },
 ]
