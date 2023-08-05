@@ -68,6 +68,21 @@ def typical_cache_test(
     assert expected.dtype == actual2.dtype
 
 
+def test_use_no_nparray_output():
+    """
+    Test verifies that you can use the cache not only for class np.array,
+    but also for a list of the right size.
+    """    
+    name: str = inspect.currentframe().f_code.co_name  # type: ignore
+    expected = [[1,2], [0.3,0.45]]
+    @cache(name)
+    def testing_fun():
+        return expected
+    
+    actual = testing_fun(use_cache=False)
+    assert np.all(np.array(expected) == actual)
+
+
 def typical_save_test(
     name: str,
     size: Tuple[int, ...],

@@ -1,7 +1,7 @@
 import os
 from typing import Any, Callable, Optional
 
-from numpy import ndarray
+from numpy import array, ndarray
 
 from mySweetCache.exceptions import MSCDoesNotExistException
 from mySweetCache.save_helper import SaveHelper
@@ -101,12 +101,14 @@ def cache(
         def TO_RETURN(*args, use_cache: Optional[bool] = None):
             if use_cache is None:
                 use_cache = SETUP.MSC_USE_CACHE
-            # SaveHelper = SaveHelper()
             if SaveHelper.cache_exists(MSC_name) and use_cache:
                 return SaveHelper.read_from_file(
                     MSC_name,
                 )
             ret = fun(*args)
+            if not type(ret) is ndarray:
+                ret = array(ret)
+
             SaveHelper.save_to_file(
                 ret,
                 MSC_name,

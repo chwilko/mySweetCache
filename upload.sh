@@ -3,6 +3,8 @@
 
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade build
+mkdir -p dist
+rm -fr dist/*
 python3 -m build
 python3 -m pip install --upgrade twine
 
@@ -10,5 +12,5 @@ python3 -m pip install --upgrade twine
 
 echo "use __token__ as username"
 echo "and token value as password"
-twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+python3 -m twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
 

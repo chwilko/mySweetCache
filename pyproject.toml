@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mySweetCache"
-version = "1.0.0"
+version = "1.1.0"
 description = ""
 authors = ["chwilko <bartekchwilkowski@gmail.com>"]
 license = "MIT"
@@ -24,7 +24,7 @@ ipykernel = "^6.25.0"
 
 [project]
 name = "mySweetCache"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
   { name="Bartłomiej Chwiłkowski", email="bartekchwilkowski@gmail.com" },
 ]
