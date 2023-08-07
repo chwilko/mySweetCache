@@ -4,6 +4,9 @@ This project let make fast and simply cache
 ## autors
 Bartłomiej Chwiłkowski (github: chwilko)
 
+## license
+MIT license
+
 
 # Structure
 mySweetCache:
